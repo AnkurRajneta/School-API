@@ -1,4 +1,8 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastapi.templating import Jinja2Templates
+
 from fastapi import Request
 
 templates = Jinja2Templates(directory="app/templates")  
@@ -15,36 +19,36 @@ router = APIRouter()
 
 
 @router.get("/students/1.1", response_model=List[Section])
-def get_all_students(db: Session = Depends(get_db)):
+async def get_all_students(db: Session = Depends(get_db)):
     service = school_service(db)
-    return service.get_all_school()
+    return await service.get_all_school()
 
 
 @router.post("/students/1.2", response_model=Section)
-def create_student(structure: School_schema, db: Session = Depends(get_db)):
+async def create_student(structure: School_schema, db: Session = Depends(get_db)):
     service = school_service(db)
-    return service.create_student(structure)
+    return await service.create_student(structure)
 
 
 @router.put("/students/1.3/{school_id}", response_model=Section)
-def update_student(school_id: int, structure: School_schema, db: Session = Depends(get_db)):
+async def update_student(school_id: int, structure: School_schema, db: Session = Depends(get_db)):
     service = school_service(db)
     result = service.update_student(structure, school_id)
     if not result:
         raise HTTPException(status_code=404, detail="Student not found")
-    return result
+    return await result
 
 
 @router.delete("/students/1.4/{school_id}")
-def delete_student(school_id: int, db: Session = Depends(get_db)):
+async def delete_student(school_id: int, db: Session = Depends(get_db)):
     service = school_service(db)
     result = service.delete_student(school_id)
     if not result:
         raise HTTPException(status_code=404, detail="Student not found")
-    return {"deleted": True}
+    return await {"deleted": True}
 
 
 @router.get("/dashboard")
-def dashboard(request: Request):
-    return templates.TemplateResponse("routes.html", {"request": request})
+async def dashboard(request: Request):
+    return await templates.TemplateResponse("routes.html", {"request": request})
 
