@@ -15,9 +15,3 @@ app = FastAPI(
 
 # ✅ Register routes
 app.include_router(school_controller.router, prefix="/school", tags=["School"])
-
-# ✅ Async-safe DB table creation
-@app.on_event("startup")
-async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(school_model.Base.metadata.create_all)

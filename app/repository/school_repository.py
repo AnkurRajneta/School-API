@@ -7,21 +7,18 @@ class SchoolRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    # ✅ Get all students
     async def get_all_students(self):
         stmt = select(School)
         result = await self.db.execute(stmt)
-        return result.scalars().all()  # ❌ Do NOT await .all() — it's not a coroutine
+        return result.scalars().all()  
 
-    # ✅ Create student
     async def create_student(self, structure: School_schema):
         new_student = School(name=structure.name, standard=structure.standard)
         self.db.add(new_student)
         await self.db.commit()
         await self.db.refresh(new_student)
-        return new_student  # ❌ Do NOT await a normal object
+        return new_student  
 
-    # ✅ Update student
     async def update(self, structure: School_schema, school_id: int):
         stmt = select(School).where(School.id == school_id)
         result = await self.db.execute(stmt)
@@ -36,11 +33,10 @@ class SchoolRepository:
         await self.db.refresh(updated_file)
         return updated_file
 
-    # ✅ Delete student
     async def deleted(self, school_id: int):
         stmt = select(School).where(School.id == school_id)
         result = await self.db.execute(stmt)
-        deleted_file = result.scalars().first()  # ❌ you missed () — should be .first()
+        deleted_file = result.scalars().first()  
 
         if not deleted_file:
             return False
